@@ -1,8 +1,7 @@
 <template>
       <div class="painel">
         <h2 class="painel-titulo">{{ titulo }}</h2>
-        <div class="painel-conteudo">
-        </div>
+        <slot class="painel-conteudo"></slot>
       </div>
 </template>
 
@@ -14,7 +13,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
  
    /* estilo do painel */ 
 
@@ -39,4 +38,7 @@ export default {
     text-transform: uppercase;
   }
 
+  * {
+    box-shadow: 5px 5px 5px black;
+  }
 </style>
