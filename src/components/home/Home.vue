@@ -2,6 +2,7 @@
 <template>
 <div>
   <h1 class="centralizado">{{titulo}}</h1>
+  <p v-show="mensagem" class="centralizado">{{ mensagem }}</p>
   
   <input type="search" class="filtro" v-on:input="filtro = $event.target.value" placeholder="buscar">
   
@@ -11,6 +12,9 @@
       <meu-painel :titulo="foto.titulo">
 
         <imagem-responsiva v-meu-transform:scale.animate="1.5" :url="foto.url" :titulo="foto.titulo"/>
+        <router-link :to="{name: 'altera', params: { id: foto._id } }">
+          <meu-botao tipo="button" rotulo="ALTERAR"/>
+        </router-link> 
         <meu-botao 
           tipo="button" 
           rotulo="REMOVER" 
@@ -30,6 +34,8 @@
 import Painel from '../shared/painel/Painel.vue';
 import ImagemResponsiva from '../shared/painel/imagem-responsiva/ImagemResponsiva.vue';
 import Botao from '../shared/botao/Botao.vue';
+import Foto from '../../domain/foto/foto';
+import FotoService from '../../domain/foto/FotoService';
 
 
 export default {
@@ -46,7 +52,8 @@ export default {
 
       titulo: "Alurapic",
       fotos:[],
-      filtro:''
+      filtro:'',
+      mensagen: ''
     }
   },
 
@@ -64,17 +71,27 @@ export default {
 
   methods: {
 
-    remove(foto) {    
-        alert('Remover a foto!' + foto.titulo);
+    remove(foto) { 
+      
+      this.service.apaga(foto._id)
+      .then(()=> {
+            let indice = this.fotos.indexOf(foto);
+            this.fotos.splice(indice, 1);
+            this.mensagen = 'foto removida com sucesso'
+            }, err => {
+              this.mensagem = err.message;
+        });
     }
 
   },
 
   created() {
 
-    this.$http.get('http://localhost:3000/v1/fotos')    
-      .then(res => res.json())
-      .then(fotos => this.fotos = fotos, err => console.log(err));
+    this.service = new FotoService(this.$resource);
+    
+    this.service
+    .lista()
+    .then(fotos => this.fotos = fotos, err => this.mensagen = err.message);
   }
 }
 </script>
